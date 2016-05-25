@@ -7,10 +7,26 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.kristich.shiney.MainActivity">
+    tools:context="com.kristich.shiney.MainActivity"
+    android:background="#303F9F">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="100"
+        android:id="@+id/tempLabel"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/white"
+        android:textSize="150sp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/degreeImageView"
+        android:layout_alignTop="@+id/tempLabel"
+        android:layout_toRightOf="@+id/tempLabel"
+        android:layout_toEndOf="@+id/tempLabel"
+        android:src="@drawable/degree"
+        android:layout_marginTop="30dp" />
 </RelativeLayout>
