@@ -6,10 +6,13 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.net.ConnectivityManagerCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -49,6 +52,10 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.iconImageView) ImageView iconImageView;
 
+    @BindView(R.id.refreshImageView) ImageView refreshImageView;
+
+    @BindView(R.id.progressBar) ProgressBar progressBar;
+
 
 
     @Override
@@ -58,9 +65,29 @@ public class MainActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        progressBar.setVisibility(View.INVISIBLE);
+
+
+        refreshImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                getForeCast();
+
+            }
+        });
+
+
+        getForeCast();
 
 
 
+        Log.d(TAG, "Main UI code is running");
+
+
+    }
+
+    private void getForeCast() {
 
 
         String apiKey = "feba8ae2ba4acc2410552eb8badea616";
@@ -70,11 +97,12 @@ public class MainActivity extends AppCompatActivity {
         double lon = 7.3986;
 
 
-
         String foreCastUrl = "https://api.forecast.io/forecast/" + apiKey + "/" + lat + "," + lon ;
 
 
         if (isNetworkAvailable()) {
+
+            toggleRefresh();
 
 
             OkHttpClient client = new OkHttpClient.Builder()
@@ -91,10 +119,31 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(Call call, IOException e) {
 
 
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            toggleRefresh();
+
+                        }
+                    });
+
+                    alertUserAboutError();
+
+
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            toggleRefresh();
+
+                        }
+                    });
 
 
                     try {
@@ -145,10 +194,21 @@ public class MainActivity extends AppCompatActivity {
             alertUserAboutNetworkError();
 
         }
+    }
 
+    private void toggleRefresh() {
 
+        if (progressBar.getVisibility() == View.INVISIBLE ) {
 
-        Log.d(TAG, "Main UI code is running");
+            progressBar.setVisibility(View.VISIBLE);
+            refreshImageView.setVisibility(View.INVISIBLE);
+
+        } else {
+
+            progressBar.setVisibility(View.INVISIBLE);
+            refreshImageView.setVisibility(View.VISIBLE);
+
+        }
 
 
     }
@@ -241,6 +301,22 @@ public class MainActivity extends AppCompatActivity {
         AlertDialogFragment dialog = new AlertDialogFragment();
 
         dialog.show(getSupportFragmentManager(), "error_dialog");
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        View decorView = getWindow().getDecorView();
+// Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+// Remember that you should never show the action bar if the
+// status bar is hidden, so hide that too if necessary.
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
 
     }
 }
